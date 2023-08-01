@@ -7,7 +7,8 @@ public class RayTracingMaterialPropertyIndices
     public readonly int NumOfSpheres;
     public readonly int NumOfReflections;
     public readonly int NumOfRays;
-
+    public readonly int RenderedFrames;
+    
     public RayTracingMaterialPropertyIndices()
     {
         SpheresData = Shader.PropertyToID("_Spheres");
@@ -15,5 +16,6 @@ public class RayTracingMaterialPropertyIndices
         NumOfSpheres = Shader.PropertyToID("_NumOfSpheres");
         NumOfReflections = Shader.PropertyToID("_NumOfReflections");
         NumOfRays = Shader.PropertyToID("_NumOfRays");
+        RenderedFrames = Shader.PropertyToID("_RenderedFrames");
     }
 }

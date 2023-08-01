@@ -12,15 +12,19 @@ public class RaytracingShaderBridge
     [SerializeField] [Min(1)] private int _numOfReflections = 1;
     private RayTracingMaterialPropertyIndices _indices = new();
     private ComputeBuffer _buffer;
-    
-    public Material Material => _material;
-    
+
     public void BufferData()
     {
         TryInitialize();
         PassCameraParameters();
         PassSpheres();
         PassRaytracingParameters();
+    }
+
+    public void DrawToTexture(RenderTexture currentFrame, int renderedFrames)
+    {
+        _material.SetInt(_indices.RenderedFrames, renderedFrames);
+        Graphics.Blit(null, currentFrame, _material);
     }
 
     private void TryInitialize()

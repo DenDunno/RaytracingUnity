@@ -84,6 +84,7 @@ Shader "Raytracing"
             int _NumOfRays;
             StructuredBuffer<Sphere> _Spheres;
             int _NumOfSpheres;
+            int _RenderedFrames;
             
             v2f vert (appdata v)
             {
@@ -145,7 +146,7 @@ Shader "Raytracing"
 
             float Random(inout uint seed)
             {
-                seed *= (seed + 195439) * (seed + 124395) * (seed + 845921);
+                seed *= (seed + 195439) * (seed + 124395) * (seed + 845921) + _RenderedFrames * 123456;
                 return seed / 4294967295.0;
             }
             
@@ -168,15 +169,56 @@ Shader "Raytracing"
                 return randomDirection * sign(dot(randomDirection, normal));
             }
 
+            HitResult HitPlane(const Ray ray, float3 normal, float3 origin)
+            {
+                HitResult result = CreateHitResult();
+                const float dotRayNormal = dot(ray.direction, normal);
+
+                if (dotRayNormal >= 0)
+                    return result;
+                
+                result.distance = dot(origin - ray.origin, normal) / dotRayNormal;
+                result.normal = normal;
+                result.success = result.distance >= 0;
+                result.hitPoint = result.distance * ray.direction + ray.origin;
+                result.material.color = float4(0,1,0,1);
+
+                return result;
+            }
+
+            HitResult HitTriangle(const Ray ray, float3 a, float3 b, float3 c)
+            {
+                HitResult result = CreateHitResult();
+                const float3 normal = normalize(cross(b - a, c - a));
+                const float dotRayNormal = dot(ray.direction, normal);
+
+                if (dotRayNormal < 0)
+                {
+                    result.normal = normal;
+                    result.material.color = float4(0,1,0,0);
+                    result.distance = dot(a - ray.origin, normal) / dotRayNormal;
+                    result.hitPoint = result.distance * ray.direction + ray.origin;
+                    result.success = dot(result.hitPoint - a, cross(normal, b - a)) >= 0 &&
+                                     dot(result.hitPoint - b, cross(normal, c - b)) >= 0 &&
+                                     dot(result.hitPoint - c, cross(normal, a - c)) >= 0;
+                }
+                
+                return result;
+            }
+            
             HitResult GetHitResult(const Ray ray)
             {
                 HitResult result = CreateHitResult();
+                HitResult planeHit = HitTriangle(ray, _Spheres[0].position, _Spheres[1].position, _Spheres[2].position);
+
+                if (planeHit.success)
+                    result = planeHit;
                 
                 for (int i = 0; i < _NumOfSpheres; ++i)
                 {
                     const HitResult hit = HitSphere(ray, i);
 
-                    if (hit.distance < result.distance)
+                    if (hit.success && hit.distance < result.distance)
                     {
                         result = hit;
                     }

@@ -9,6 +9,5 @@ int _RenderedFrames;
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     const float weight = 1.0 / (_RenderedFrames + 1);
-    
     _CurrentFrame[id.xy] = saturate(_PreviousFrame[id.xy] * (1 - weight) + _CurrentFrame[id.xy] * weight);
 }

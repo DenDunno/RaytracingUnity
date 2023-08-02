@@ -38,6 +38,7 @@ Shader "Raytracing"
                 float4 color;
                 float4 emissionColor;
                 float emissionStrength;
+                float roughness;
             };
             
             struct HitResult
@@ -66,6 +67,7 @@ Shader "Raytracing"
                 result.material.color = half4(0,0,0,1);
                 result.material.emissionColor = half4(0,0,0,1);
                 result.material.emissionStrength = 0;
+                result.material.roughness = 0;
                 
                 return result;
             }
@@ -271,8 +273,10 @@ Shader "Raytracing"
 
                     if (hit.success)
                     {
+                        const float3 randomDirection = GetRandomHemisphereDirection(hit.normal, seed);
+                        const float3 reflectionDirection = normalize(reflect(ray.direction, hit.normal));
+                        ray.direction = lerp(randomDirection, reflectionDirection, hit.material.roughness);
                         ray.origin = hit.hitPoint;
-                        ray.direction = GetRandomHemisphereDirection(hit.normal, seed);
 
                         const float light = max(dot(hit.normal, ray.direction), 0);
                         emittedLight += hit.material.emissionColor * hit.material.emissionStrength * rayColor;
@@ -290,14 +294,13 @@ Shader "Raytracing"
             fixed4 Trace(Ray ray, uint seed)
             {
                 fixed3 resultColor;
-                HitResult result = GetHitResult(ray);
+                
                 for (int j = 0; j < _RaysPerPixel; ++j)
                 {
                     Random(seed);
                     resultColor += TraceRay(ray, seed);
                 }
                 
-                //return result.material.color;
                 return fixed4(resultColor / _RaysPerPixel, 1);
             }
             

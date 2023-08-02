@@ -1,25 +1,21 @@
 ﻿using System;
-using Unity.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
 public class RaytracingShaderBridge
 {
     [SerializeField] private Camera _camera;
-    [SerializeField] private Sphere[] _spheres;
+    [SerializeField] private List<Sphere> _spheres;
+    [SerializeField] private List<RayTracedMesh> _rayTracedMeshes;
     [SerializeField] private Material _material;
     [SerializeField] [Min(1)] private int _numOfRays = 10;
     [SerializeField] [Min(1)] private int _numOfReflections = 1;
     private RayTracingMaterialPropertyIndices _indices = new();
-    private ComputeBuffer _buffer;
-
-    public void BufferData()
-    {
-        TryInitialize();
-        PassCameraParameters();
-        PassSpheres();
-        PassRaytracingParameters();
-    }
+    private SphereBuffer _sphereBuffer;
+    private RayTracedMeshBuffer _meshesBuffer;
+    private TriangleBuffer _trianglesBuffer;
 
     public void DrawToTexture(RenderTexture currentFrame, int renderedFrames)
     {
@@ -27,9 +23,20 @@ public class RaytracingShaderBridge
         Graphics.Blit(null, currentFrame, _material);
     }
 
+    public void BufferData()
+    {
+        TryInitialize();
+        PassCameraParameters();
+        PassSpheres();
+        PassMeshes();
+        PassRaytracingParameters();
+    }
+
     private void TryInitialize()
     {
-        _buffer ??= new ComputeBuffer(100, SphereData.GetSize(), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
+        _trianglesBuffer ??= new TriangleBuffer(1000, Triangle.GetSize(), _rayTracedMeshes);
+        _meshesBuffer ??= new RayTracedMeshBuffer(100, RayTracedMeshData.GetSize(), _rayTracedMeshes);
+        _sphereBuffer ??= new SphereBuffer(100, SphereData.GetSize(), _spheres);
     }
 
     private void PassCameraParameters()
@@ -49,17 +56,22 @@ public class RaytracingShaderBridge
 
     private void PassSpheres()
     {
-        NativeArray<SphereData> spheres = _buffer.BeginWrite<SphereData>(0, _spheres.Length);
+        _sphereBuffer.Map(_spheres.Count);
+        _material.SetBuffer(_indices.SpheresData, _sphereBuffer.Container);
+        _material.SetInt(_indices.NumOfSpheres, _spheres.Count);
+    }
 
-        for (int i = 0; i < spheres.Length; ++i)
-        {
-            spheres[i] = _spheres[i].GetData();
-        }
-
-        _buffer.EndWrite<SphereData>(_spheres.Length);
-
-        _material.SetBuffer(_indices.SpheresData, _buffer);
-        _material.SetInt(_indices.NumOfSpheres, _spheres.Length);
+    private void PassMeshes()
+    {
+        _rayTracedMeshes.ForEach(mesh => mesh.UpdateTriangles());
+        
+        _trianglesBuffer.Map(_rayTracedMeshes.Sum(mesh => mesh.TrianglesCount));
+        _meshesBuffer.Map(_rayTracedMeshes.Count);
+        
+        _material.SetBuffer(_indices.Meshes, _meshesBuffer.Container);
+        _material.SetBuffer(_indices.Triangles, _trianglesBuffer.Container);
+        
+        _material.SetInt(_indices.MeshesCount, _rayTracedMeshes.Count);
     }
 
     private void PassRaytracingParameters()

@@ -79,11 +79,30 @@ Shader "Raytracing"
                 return ray;
             }
 
+            struct Triangle
+            {
+                float3 a;
+                float3 b;
+                float3 c;
+            };
+            
+            struct MeshData
+			{
+                uint startIndex;
+                uint trianglesCount;
+                float3 boundsMin;
+                float3 boundsMax;
+                RayTracingMaterial material;
+            };
+
             half4 _CameraParams;
-            int _NumOfReflections;
-            int _NumOfRays;
+            int _Reflections;
+            int _RaysPerPixel;
+            StructuredBuffer<Triangle> _Triangles;
             StructuredBuffer<Sphere> _Spheres;
-            int _NumOfSpheres;
+            StructuredBuffer<MeshData> _Meshes;
+            int _SpheresCount;
+            int _MeshesCount;
             int _RenderedFrames;
             
             v2f vert (appdata v)
@@ -195,7 +214,6 @@ Shader "Raytracing"
                 if (dotRayNormal < 0)
                 {
                     result.normal = normal;
-                    result.material.color = float4(0,1,0,0);
                     result.distance = dot(a - ray.origin, normal) / dotRayNormal;
                     result.hitPoint = result.distance * ray.direction + ray.origin;
                     result.success = dot(result.hitPoint - a, cross(normal, b - a)) >= 0 &&
@@ -209,12 +227,30 @@ Shader "Raytracing"
             HitResult GetHitResult(const Ray ray)
             {
                 HitResult result = CreateHitResult();
-                HitResult planeHit = HitTriangle(ray, _Spheres[0].position, _Spheres[1].position, _Spheres[2].position);
+                // HitResult planeHit = HitTriangle(ray, _Spheres[0].position, _Spheres[1].position, _Spheres[2].position);
+                //
+                // if (planeHit.success)
+                //     result = planeHit;
 
-                if (planeHit.success)
-                    result = planeHit;
+                 for (int meshIndex = 0; meshIndex < _MeshesCount; ++meshIndex)
+                {
+                    const int startIndex = _Meshes[meshIndex].startIndex;
+                    const int endIndex = _Meshes[meshIndex].startIndex + _Meshes[meshIndex].trianglesCount;
+                     
+                    for (int i = startIndex; i < endIndex; ++i)
+                    {
+                        const Triangle tris = _Triangles[i];
+                        const HitResult hit = HitTriangle(ray, tris.a, tris.b, tris.c);
                 
-                for (int i = 0; i < _NumOfSpheres; ++i)
+                        if (hit.success && hit.distance < result.distance)
+                        {
+                            result = hit;
+                            result.material = _Meshes[meshIndex].material; 
+                        }
+                    }
+                }
+                
+                for (int i = 0; i < _SpheresCount; ++i)
                 {
                     const HitResult hit = HitSphere(ray, i);
 
@@ -232,7 +268,7 @@ Shader "Raytracing"
                 half4 rayColor = 1;
                 half4 emittedLight = 0;
                 
-                for (int i = 0; i < _NumOfReflections; ++i)
+                for (int i = 0; i < _Reflections; ++i)
                 {
                     const HitResult hit = GetHitResult(ray);
 
@@ -258,13 +294,13 @@ Shader "Raytracing"
             {
                 fixed3 resultColor;
 
-                for (int j = 0; j < _NumOfRays; ++j)
+                for (int j = 0; j < _RaysPerPixel; ++j)
                 {
                     Random(seed);
                     resultColor += TraceRay(ray, seed);
                 }
                 
-                return fixed4(resultColor / _NumOfRays, 1);
+                return fixed4(resultColor / _RaysPerPixel, 1);
             }
             
             fixed4 frag (v2f i) : SV_Target

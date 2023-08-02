@@ -9,16 +9,10 @@ public class Raytracing : MonoBehaviour
     private readonly AccumulateTextures _textures = new();
     private int _renderedFrames;
 
-    private void Start()
-    {
-        ResetFrame();
-    }
-
-    [ContextMenu("ResetFrame")]
     public void ResetFrame()
     {
-        _renderedFrames = 0;
         _raytracingBridge.BufferData();
+        _renderedFrames = 0;
     }
 
     private void Update()   

@@ -17,6 +17,6 @@ public readonly struct SphereData
 
     public static int GetSize()
     {
-        return 36 + 4 + 3 * 4;
+        return 4 + 12 + RayTracingMaterial.GetSize();
     }
 }

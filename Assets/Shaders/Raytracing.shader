@@ -210,11 +210,12 @@ Shader "Raytracing"
                 HitResult result = CreateHitResult();
                 const float3 normal = normalize(cross(b - a, c - a));
                 const float dotRayNormal = dot(ray.direction, normal);
-
-                if (dotRayNormal < 0)
+                const float distance = dot(a - ray.origin, normal) / dotRayNormal;
+                
+                if (dotRayNormal < 0 && distance > 0)
                 {
                     result.normal = normal;
-                    result.distance = dot(a - ray.origin, normal) / dotRayNormal;
+                    result.distance = distance;
                     result.hitPoint = result.distance * ray.direction + ray.origin;
                     result.success = dot(result.hitPoint - a, cross(normal, b - a)) >= 0 &&
                                      dot(result.hitPoint - b, cross(normal, c - b)) >= 0 &&
@@ -227,12 +228,18 @@ Shader "Raytracing"
             HitResult GetHitResult(const Ray ray)
             {
                 HitResult result = CreateHitResult();
-                // HitResult planeHit = HitTriangle(ray, _Spheres[0].position, _Spheres[1].position, _Spheres[2].position);
-                //
-                // if (planeHit.success)
-                //     result = planeHit;
 
-                 for (int meshIndex = 0; meshIndex < _MeshesCount; ++meshIndex)
+                for (int i = 0; i < _SpheresCount; ++i)
+                {
+                    const HitResult hit = HitSphere(ray, i);
+
+                    if (hit.success && hit.distance < result.distance)
+                    {
+                        result = hit;
+                    }
+                }
+                
+                for (int meshIndex = 0; meshIndex < _MeshesCount; ++meshIndex)
                 {
                     const int startIndex = _Meshes[meshIndex].startIndex;
                     const int endIndex = _Meshes[meshIndex].startIndex + _Meshes[meshIndex].trianglesCount;
@@ -245,21 +252,11 @@ Shader "Raytracing"
                         if (hit.success && hit.distance < result.distance)
                         {
                             result = hit;
-                            result.material = _Meshes[meshIndex].material; 
+                            result.material = _Meshes[meshIndex].material;
                         }
                     }
                 }
                 
-                for (int i = 0; i < _SpheresCount; ++i)
-                {
-                    const HitResult hit = HitSphere(ray, i);
-
-                    if (hit.success && hit.distance < result.distance)
-                    {
-                        result = hit;
-                    }
-                }
-
                 return result;
             }
             
@@ -293,13 +290,14 @@ Shader "Raytracing"
             fixed4 Trace(Ray ray, uint seed)
             {
                 fixed3 resultColor;
-
+                HitResult result = GetHitResult(ray);
                 for (int j = 0; j < _RaysPerPixel; ++j)
                 {
                     Random(seed);
                     resultColor += TraceRay(ray, seed);
                 }
                 
+                //return result.material.color;
                 return fixed4(resultColor / _RaysPerPixel, 1);
             }
             

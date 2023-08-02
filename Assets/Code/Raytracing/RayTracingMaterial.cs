@@ -7,4 +7,9 @@ public struct RayTracingMaterial
     [SerializeField] private Color _color;
     [SerializeField] private Color _emissionColor;
     [SerializeField] [Min(0)] private float _emissionStrength;
+
+    public static int GetSize()
+    {
+        return 16 + 16 + 4;
+    }
 }

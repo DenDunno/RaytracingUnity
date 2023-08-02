@@ -19,6 +19,6 @@ public struct RayTracedMeshData
     
     public static int GetSize()
     {   
-        return 4 + 4 + 12 + 12 + 36;
+        return 4 + 4 + 12 + 12 + RayTracingMaterial.GetSize();
     }
 }

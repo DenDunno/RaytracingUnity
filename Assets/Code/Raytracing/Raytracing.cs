@@ -9,24 +9,16 @@ public class Raytracing : MonoBehaviour
     private readonly AccumulateTextures _textures = new();
     private int _renderedFrames;
 
-    public void Enable()
+    public void Enable(Room room)
     {
-        ResetFrame();
+        _raytracingBridge.BufferData(room);
+        _renderedFrames = 0;
         _useRaytracing = true;
     }
-    
-    public void ResetFrame()
-    {
-        _raytracingBridge.BufferData();
-        _renderedFrames = 0;
-    }
 
-    private void Update()   
+    public void Disable()
     {
-        if (Application.isEditor && Application.isPlaying == false)
-        {
-            ResetFrame();
-        }
+        _useRaytracing = false;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -7,8 +6,6 @@ using UnityEngine;
 public class RaytracingShaderBridge
 {
     [SerializeField] private Camera _camera;
-    [SerializeField] private List<Sphere> _spheres;
-    [SerializeField] private List<RayTracedMesh> _rayTracedMeshes;
     [SerializeField] private Material _material;
     [SerializeField] [Min(1)] private int _numOfRays = 10;
     [SerializeField] [Min(1)] private int _numOfReflections = 1;
@@ -23,20 +20,24 @@ public class RaytracingShaderBridge
         Graphics.Blit(null, currentFrame, _material);
     }
 
-    public void BufferData()
+    public void BufferData(Room room)
     {
-        TryInitialize();
+        TryInitialize(room);
         PassCameraParameters();
-        PassSpheres();
-        PassMeshes();
+        PassSpheres(room);
+        PassMeshes(room);
         PassRaytracingParameters();
     }
 
-    private void TryInitialize()
+    private void TryInitialize(Room room)
     {
-        _trianglesBuffer ??= new TriangleBuffer(1000, Triangle.GetSize(), _rayTracedMeshes);
-        _meshesBuffer ??= new RayTracedMeshBuffer(100, RayTracedMeshData.GetSize(), _rayTracedMeshes);
-        _sphereBuffer ??= new SphereBuffer(100, SphereData.GetSize(), _spheres);
+        _trianglesBuffer ??= new TriangleBuffer(1000, Triangle.GetSize());
+        _meshesBuffer ??= new RayTracedMeshBuffer(100, RayTracedMeshData.GetSize());
+        _sphereBuffer ??= new SphereBuffer(100, SphereData.GetSize());
+        
+        _trianglesBuffer.SetSource(room.RayTracedMeshes);
+        _meshesBuffer.SetSource(room.RayTracedMeshes);
+        _sphereBuffer.SetSource(room.Spheres);
     }
 
     private void PassCameraParameters()
@@ -54,24 +55,24 @@ public class RaytracingShaderBridge
         _material.SetVector(_indices.ScreenSize, new Vector4(planeWidth, planeHeight, camera.nearClipPlane, 0));
     }
 
-    private void PassSpheres()
+    private void PassSpheres(Room room)
     {
-        _sphereBuffer.Map(_spheres.Count);
+        _sphereBuffer.Map(room.Spheres.Count);
         _material.SetBuffer(_indices.SpheresData, _sphereBuffer.Container);
-        _material.SetInt(_indices.NumOfSpheres, _spheres.Count);
+        _material.SetInt(_indices.NumOfSpheres, room.Spheres.Count);
     }
 
-    private void PassMeshes()
+    private void PassMeshes(Room room)
     {
-        _rayTracedMeshes.ForEach(mesh => mesh.UpdateTriangles());
+        room.RayTracedMeshes.ForEach(mesh => mesh.UpdateTriangles());
         
-        _trianglesBuffer.Map(_rayTracedMeshes.Sum(mesh => mesh.TrianglesCount));
-        _meshesBuffer.Map(_rayTracedMeshes.Count);
+        _trianglesBuffer.Map(room.RayTracedMeshes.Sum(mesh => mesh.TrianglesCount));
+        _meshesBuffer.Map(room.RayTracedMeshes.Count);
         
         _material.SetBuffer(_indices.Meshes, _meshesBuffer.Container);
         _material.SetBuffer(_indices.Triangles, _trianglesBuffer.Container);
         
-        _material.SetInt(_indices.MeshesCount, _rayTracedMeshes.Count);
+        _material.SetInt(_indices.MeshesCount, room.RayTracedMeshes.Count);
     }
 
     private void PassRaytracingParameters()

@@ -3,9 +3,13 @@ using Unity.Collections;
 
 public class TriangleBuffer : Buffer<Triangle>
 {
-    private readonly IReadOnlyList<RayTracedMesh> _meshes;
+    private IReadOnlyList<RayTracedMesh> _meshes;
 
-    public TriangleBuffer(int count, int stride, IReadOnlyList<RayTracedMesh> meshes) : base(count, stride)
+    public TriangleBuffer(int count, int stride) : base(count, stride)
+    {
+    }
+
+    public void SetSource(IReadOnlyList<RayTracedMesh> meshes)
     {
         _meshes = meshes;
     }

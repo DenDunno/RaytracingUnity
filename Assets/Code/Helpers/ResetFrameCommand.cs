@@ -12,14 +12,14 @@ public class ResetFrameCommand : MonoBehaviour
 
     private void Start()
     {
-        _raytracing.ResetFrame();
+        //_raytracing.ResetFrame();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            _raytracing.ResetFrame();
+            //_raytracing.ResetFrame();
         }
     }
 }

@@ -3,9 +3,13 @@ using Unity.Collections;
 
 public class SphereBuffer : Buffer<SphereData>
 {
-    private readonly IReadOnlyList<Sphere> _spheres;
+    private IReadOnlyList<Sphere> _spheres;
 
-    public SphereBuffer(int count, int stride, IReadOnlyList<Sphere> spheres) : base(count, stride)
+    public SphereBuffer(int count, int stride) : base(count, stride)
+    {
+    }
+    
+    public void SetSource(IReadOnlyList<Sphere> spheres)
     {
         _spheres = spheres;
     }

@@ -64,7 +64,7 @@ public class RaytracingShaderBridge
 
     private void PassMeshes(Room room)
     {
-        room.RayTracedMeshes.ForEach(mesh => mesh.UpdateTriangles());
+        room.RayTracedMeshes.ForEach(mesh => mesh.UpdateTransform());
         
         _trianglesBuffer.Map(room.RayTracedMeshes.Sum(mesh => mesh.TrianglesCount));
         _meshesBuffer.Map(room.RayTracedMeshes.Count);

@@ -6,8 +6,9 @@ public class RayVisualizer : MonoBehaviour
 {
     [SerializeField] [Range(1, 100)] private int _xCount = 10;
     [SerializeField] [Range(1, 100)] private int _yCount = 10;
-    [SerializeField] [Min(0)] private float _zOffset = 1;
+    [SerializeField] private float _zOffset = 1;
     [SerializeField] private bool _showHitRays;
+    [SerializeField] private MeshRenderer _testObject;
     private Vector3 _bottomLeftPoint;
     private Vector2 _rayOffset;
     private Camera _camera;
@@ -52,19 +53,47 @@ public class RayVisualizer : MonoBehaviour
             origin = transform.position,
             direction = color
         };
-
-        HitResult result = HitSphere(ray, new Vector3(2, 0, 1), 1);
-
-        if (result.success && _showHitRays)
+        
+        if (_showHitRays)
         {
-            Debug.DrawLine(transform.position, result.hitPoint, Color.magenta);
+            bool result = IntersectAABB(ray.origin, ray.direction, _testObject.bounds.min, _testObject.bounds.max);
+
+            if (result)
+            {
+                Debug.DrawLine(transform.position, point + (point - transform.position).normalized * _zOffset, new Color(color.x, color.y, color.z, 1));
+            }
         }
-        else if (_showHitRays == false)
+        else
         {
             Debug.DrawLine(transform.position, point + (point - transform.position).normalized * _zOffset, new Color(color.x, color.y, color.z, 1));
         }
     }
 
+    bool IntersectAABB(Vector3 rayOrigin, Vector3 rayDir, Vector3 boxMin, Vector3 boxMax)
+    {
+        if (Vector3.Dot(rayDir, (boxMax + boxMin) / 2 - rayOrigin) < 0)
+           return false;
+        
+        Vector3 tMin = new Vector3(
+            (boxMin.x - rayOrigin.x) / rayDir.x,
+            (boxMin.y - rayOrigin.y) / rayDir.y,
+            (boxMin.z - rayOrigin.z) / rayDir.z
+        );
+
+        Vector3 tMax = new Vector3(
+            (boxMax.x - rayOrigin.x) / rayDir.x,
+            (boxMax.y - rayOrigin.y) / rayDir.y,
+            (boxMax.z - rayOrigin.z) / rayDir.z
+        );
+
+        Vector3 t1 = Vector3.Min(tMin, tMax);
+        Vector3 t2 = Vector3.Max(tMin, tMax);
+        float tNear = Mathf.Max(Mathf.Max(t1.x, t1.y), t1.z);
+        float tFar = Mathf.Min(Mathf.Min(t2.x, t2.y), t2.z);
+
+        return tNear <= tFar;
+    }
+    
     HitResult HitSphere(Ray ray, Vector3 centre, float radius)
     {
         HitResult result; 

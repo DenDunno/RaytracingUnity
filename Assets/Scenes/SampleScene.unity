@@ -160,6 +160,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 74329189}
+  _meshRenderer: {fileID: 74329190}
 --- !u!33 &74329189
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -397,6 +398,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 142141112}
+  _meshRenderer: {fileID: 142141113}
 --- !u!33 &142141112
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -564,6 +566,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 285203388}
+  _meshRenderer: {fileID: 285203387}
 --- !u!1 &287159567
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +926,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 364180447}
+  _meshRenderer: {fileID: 364180448}
 --- !u!33 &364180447
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1279,6 +1283,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 446151612}
+  _meshRenderer: {fileID: 446151611}
 --- !u!1 &499158150
 GameObject:
   m_ObjectHideFlags: 0
@@ -1457,6 +1462,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 617761444}
+  _meshRenderer: {fileID: 617761443}
 --- !u!1 &629476268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1831,7 +1837,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194232}
-  - component: {fileID: 963194233}
+  - component: {fileID: 963194234}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1906,7 +1912,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -1.058, y: 0.5, z: 0}
+  m_LocalPosition: {x: -1.0579994, y: 0.5, z: -0.00000043501495}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1933,19 +1939,23 @@ MonoBehaviour:
   _accumulateShader:
     _accumulateShader: {fileID: 7200000, guid: 2f13770dc49e6d8499eeff88df77a133, type: 3}
   _useRaytracing: 0
---- !u!114 &963194233
+--- !u!114 &963194234
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff1656401f524be3b1a2f71f98f7cb95, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b703224a3f01e1439acac532a2c2134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _raytracing: {fileID: 963194232}
+  _xCount: 100
+  _yCount: 100
+  _zOffset: 2
+  _showHitRays: 1
+  _testObject: {fileID: 1667216141}
 --- !u!1 &986208202
 GameObject:
   m_ObjectHideFlags: 0
@@ -2185,6 +2195,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0.983
   _meshFilter: {fileID: 1202817183}
+  _meshRenderer: {fileID: 1202817184}
 --- !u!33 &1202817183
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2392,6 +2403,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 1324769664}
+  _meshRenderer: {fileID: 1324769663}
 --- !u!1 &1400608048
 GameObject:
   m_ObjectHideFlags: 0
@@ -2429,6 +2441,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 1400608050}
+  _meshRenderer: {fileID: 1400608051}
 --- !u!33 &1400608050
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2724,6 +2737,7 @@ MonoBehaviour:
     _emissionStrength: 20
     _roughness: 0
   _meshFilter: {fileID: 1520550121}
+  _meshRenderer: {fileID: 1520550120}
 --- !u!23 &1520550120
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2876,6 +2890,7 @@ MonoBehaviour:
     _emissionStrength: 3
     _roughness: 0
   _meshFilter: {fileID: 1555853975}
+  _meshRenderer: {fileID: 1555853974}
 --- !u!1 &1606043586
 GameObject:
   m_ObjectHideFlags: 0
@@ -3037,6 +3052,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 1610469961}
+  _meshRenderer: {fileID: 1610469960}
 --- !u!1 &1624032915
 GameObject:
   m_ObjectHideFlags: 0
@@ -3074,6 +3090,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0.983
   _meshFilter: {fileID: 1624032917}
+  _meshRenderer: {fileID: 1624032918}
 --- !u!33 &1624032917
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3176,6 +3193,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 1
   _meshFilter: {fileID: 1667216142}
+  _meshRenderer: {fileID: 1667216141}
 --- !u!23 &1667216141
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3343,6 +3361,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 1766591581}
+  _meshRenderer: {fileID: 1766591580}
 --- !u!1 &1833229312
 GameObject:
   m_ObjectHideFlags: 0
@@ -3544,6 +3563,7 @@ MonoBehaviour:
     _emissionStrength: 0
     _roughness: 0
   _meshFilter: {fileID: 1857629302}
+  _meshRenderer: {fileID: 1857629303}
 --- !u!33 &1857629302
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3646,6 +3666,7 @@ MonoBehaviour:
     _emissionStrength: 45
     _roughness: 0
   _meshFilter: {fileID: 2023712678}
+  _meshRenderer: {fileID: 2023712677}
 --- !u!23 &2023712677
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3830,6 +3851,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 342153504}
+        m_TargetAssemblyTypeName: RoomRenderingCommand, Assembly-CSharp
+        m_MethodName: ToggleRoom
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!114 &2046250593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3970,3 +4003,4 @@ MonoBehaviour:
     _emissionStrength: 3
     _roughness: 0
   _meshFilter: {fileID: 6706952476943614699}
+  _meshRenderer: {fileID: 8401491045920885873}

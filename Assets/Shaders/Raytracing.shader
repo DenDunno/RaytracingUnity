@@ -10,9 +10,10 @@ Shader "Raytracing"
 
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma enable_d3d11_debug_symbols
             #include "UnityCG.cginc"
 
             struct appdata
@@ -226,6 +227,21 @@ Shader "Raytracing"
                 
                 return result;
             }
+
+            bool intersectAABB(float3 rayOrigin, float3 rayDir, float3 boxMin, float3 boxMax)
+            {
+                 if (dot(rayDir, (boxMax + boxMin) / 2 - rayOrigin) < 0)
+                    return false;
+                
+                float3 tMin = (boxMin - rayOrigin) / rayDir;
+                float3 tMax = (boxMax - rayOrigin) / rayDir;
+                float3 t1 = min(tMin, tMax);
+                float3 t2 = max(tMin, tMax);
+                float tNear = max(max(t1.x, t1.y), t1.z);
+                float tFar = min(min(t2.x, t2.y), t2.z);
+
+                return tNear <= tFar;
+            }
             
             HitResult GetHitResult(const Ray ray)
             {
@@ -243,18 +259,21 @@ Shader "Raytracing"
                 
                 for (int meshIndex = 0; meshIndex < _MeshesCount; ++meshIndex)
                 {
-                    const int startIndex = _Meshes[meshIndex].startIndex;
-                    const int endIndex = _Meshes[meshIndex].startIndex + _Meshes[meshIndex].trianglesCount;
-                     
-                    for (int i = startIndex; i < endIndex; ++i)
+                    if (intersectAABB(ray.origin, ray.direction, _Meshes[meshIndex].boundsMin, _Meshes[meshIndex].boundsMax))
                     {
-                        const Triangle tris = _Triangles[i];
-                        const HitResult hit = HitTriangle(ray, tris.a, tris.b, tris.c);
-                
-                        if (hit.success && hit.distance < result.distance)
+                        const int startIndex = _Meshes[meshIndex].startIndex;
+                        const int endIndex = _Meshes[meshIndex].startIndex + _Meshes[meshIndex].trianglesCount;
+                         
+                        for (int i = startIndex; i < endIndex; ++i)
                         {
-                            result = hit;
-                            result.material = _Meshes[meshIndex].material;
+                            const Triangle tris = _Triangles[i];
+                            const HitResult hit = HitTriangle(ray, tris.a, tris.b, tris.c);
+                    
+                            if (hit.success && hit.distance < result.distance)
+                            {
+                                result = hit;
+                                result.material = _Meshes[meshIndex].material;
+                            }
                         }
                     }
                 }
@@ -311,7 +330,7 @@ Shader "Raytracing"
                 
                 return Trace(ray, seed);
             }
-            ENDCG
+            ENDHLSL
         }
     }
 }

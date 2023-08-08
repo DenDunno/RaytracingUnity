@@ -43,6 +43,12 @@ public class RoomRenderingCommand : MonoBehaviour
 
     private void RenderRoom()
     {
+        ToggleRoom(false);
         _raytracing.Enable(_rooms[_horizontalScrollSnap.CurrentPage]);
+    }
+
+    public void ToggleRoom(bool enable)
+    {
+        _rooms[_horizontalScrollSnap.CurrentPage].gameObject.SetActive(enable);
     }
 }

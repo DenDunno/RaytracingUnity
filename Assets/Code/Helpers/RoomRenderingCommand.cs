@@ -19,33 +19,6 @@ public class RoomRenderingCommand : MonoBehaviour
         {
             _rooms[i].gameObject.SetActive(false);
         }
-
-        A[] array = null;
-
-        int b = 3;
-        int aLength = 20;
-        int iterations = b / aLength;
-        int remainder = b - aLength * iterations;
-
-        int index = 0;
-        for (int i = 0; i < iterations; i++, index += aLength)
-        {
-            int startIndex = index;
-            int endIndex = index + aLength;
-            
-            Pass(array[startIndex..endIndex]);
-        }
-
-        if (remainder > 0)
-            Pass(array[index..array.Length]);
-    }
-
-    private void Pass(A[] a)
-    {
-        
-    }
-    class A
-    {
     }
 
     private void OnEnable()

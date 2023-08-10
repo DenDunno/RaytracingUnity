@@ -14,10 +14,11 @@ public class RaytracingShaderBridge
     private RayTracedMeshBuffer _meshesBuffer;
     private TriangleBuffer _trianglesBuffer;
 
-    public void DrawToTexture(RenderTexture currentFrame, int renderedFrames)
+    public void DrawToTexture(AccumulateTextures accumulateTextures, int renderedFrames)
     {
         _material.SetInt(_indices.RenderedFrames, renderedFrames);
-        Graphics.Blit(null, currentFrame, _material);
+        _material.SetTexture(_indices.PreviousFrame, accumulateTextures.PreviousFrame);
+        Graphics.Blit(null, accumulateTextures.CurrentFrame, _material);
     }
 
     public void BufferData(Room room)
@@ -34,7 +35,7 @@ public class RaytracingShaderBridge
         _trianglesBuffer ??= new TriangleBuffer(1000, Triangle.GetSize());
         _meshesBuffer ??= new RayTracedMeshBuffer(100, RayTracedMeshData.GetSize());
         _sphereBuffer ??= new SphereBuffer(100, SphereData.GetSize());
-        
+
         _trianglesBuffer.SetSource(room.RayTracedMeshes);
         _meshesBuffer.SetSource(room.RayTracedMeshes);
         _sphereBuffer.SetSource(room.Spheres);

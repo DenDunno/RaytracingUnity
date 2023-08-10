@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -10,9 +9,7 @@ public class RayTracedMesh : MonoBehaviour
     [SerializeField] private MeshFilter _meshFilter;
     [SerializeField] private MeshRenderer _meshRenderer;
     private readonly List<Triangle> _triangles = new();
-    // private Vector3 _boundingBoxMin;
-    // private Vector3 _boundingBoxMax;
-    
+
     public int TrianglesCount => _meshFilter.sharedMesh.triangles.Length / 3;
     public IReadOnlyList<Triangle> Triangles => _triangles;
 
@@ -26,9 +23,7 @@ public class RayTracedMesh : MonoBehaviour
     {
         Vector3[] vertices = _meshFilter.sharedMesh.vertices;
         int[] triangles = _meshFilter.sharedMesh.triangles;
-        // _boundingBoxMin = transform.localToWorldMatrix * _meshRenderer.bounds.min;
-        // _boundingBoxMax = transform.localToWorldMatrix * _meshRenderer.bounds.max;
-        
+
         _triangles.Clear();
         
         for (int i = 0; i < triangles.Length; i += 3)
@@ -44,7 +39,7 @@ public class RayTracedMesh : MonoBehaviour
     {
         return new RayTracedMeshData(startIndex, _triangles.Count, _meshRenderer.bounds.min, _meshRenderer.bounds.max, _material);
     }
-
+    
     private Vector3 GetWorldPoint(Vector3 localVertex)
     {
         Vector4 localPoint = new(localVertex.x, localVertex.y, localVertex.z, 1);
@@ -63,10 +58,8 @@ public class RayTracedMesh : MonoBehaviour
     private void DrawBoundingBox(Vector3 min, Vector3 max)
     {
         Gizmos.color = Color.red;
-
         Vector3[] vertices = new Vector3[8];
-
-        // Define the 8 vertices of the bounding box
+        
         vertices[0] = new Vector3(min.x, min.y, min.z);
         vertices[1] = new Vector3(min.x, min.y, max.z);
         vertices[2] = new Vector3(max.x, min.y, max.z);
@@ -75,8 +68,7 @@ public class RayTracedMesh : MonoBehaviour
         vertices[5] = new Vector3(min.x, max.y, max.z);
         vertices[6] = new Vector3(max.x, max.y, max.z);
         vertices[7] = new Vector3(max.x, max.y, min.z);
-
-        // Draw lines connecting the vertices to form the bounding box
+        
         Gizmos.DrawLine(vertices[0], vertices[1]);
         Gizmos.DrawLine(vertices[1], vertices[2]);
         Gizmos.DrawLine(vertices[2], vertices[3]);

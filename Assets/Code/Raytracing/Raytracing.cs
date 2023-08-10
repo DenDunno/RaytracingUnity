@@ -4,7 +4,6 @@ using UnityEngine;
 public class Raytracing : MonoBehaviour
 {
     [SerializeField] private RaytracingShaderBridge _raytracingBridge;
-    [SerializeField] private AccumulateShader _accumulateShader;
     [SerializeField] private bool _useRaytracing;
     private readonly AccumulateTextures _textures = new();
     private int _renderedFrames;
@@ -26,9 +25,10 @@ public class Raytracing : MonoBehaviour
         if (_useRaytracing)
         {
             _textures.TryResize();
-            _raytracingBridge.DrawToTexture(_textures.CurrentFrame, _renderedFrames);
-            _accumulateShader.Dispatch(_renderedFrames, _textures.CurrentFrame, _textures.PreviousFrame);
+            _raytracingBridge.DrawToTexture(_textures, _renderedFrames);
+            CopyCurrentFrameToPrevious();
             DrawToScreen(destination);
+            TryMoveSeed();
         }
         else
         {
@@ -36,10 +36,18 @@ public class Raytracing : MonoBehaviour
         }
     }
 
-    private void DrawToScreen(RenderTexture destination)
+    private void CopyCurrentFrameToPrevious()
     {
         Graphics.Blit(_textures.CurrentFrame, _textures.PreviousFrame);
+    }
+
+    private void DrawToScreen(RenderTexture destination)
+    {
         Graphics.Blit(_textures.CurrentFrame, destination);
+    }
+
+    private void TryMoveSeed()
+    {
         _renderedFrames += Application.isPlaying ? 1 : 0;
     }
 }

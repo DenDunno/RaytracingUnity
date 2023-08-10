@@ -107,6 +107,7 @@ Shader "Raytracing"
             int _SpheresCount;
             int _MeshesCount;
             int _RenderedFrames;
+            sampler2D _PreviousFrame;
             
             v2f vert (appdata v)
             {
@@ -230,15 +231,12 @@ Shader "Raytracing"
 
             bool intersectAABB(float3 rayOrigin, float3 rayDir, float3 boxMin, float3 boxMax)
             {
-                 if (dot(rayDir, (boxMax + boxMin) / 2 - rayOrigin) < 0)
-                    return false;
-                
-                float3 tMin = (boxMin - rayOrigin) / rayDir;
-                float3 tMax = (boxMax - rayOrigin) / rayDir;
+                const float3 tMin = (boxMin - rayOrigin) / rayDir;
+                const float3 tMax = (boxMax - rayOrigin) / rayDir;
                 float3 t1 = min(tMin, tMax);
                 float3 t2 = max(tMin, tMax);
-                float tNear = max(max(t1.x, t1.y), t1.z);
-                float tFar = min(min(t2.x, t2.y), t2.z);
+                const float tNear = max(max(t1.x, t1.y), t1.z);
+                const float tFar = min(min(t2.x, t2.y), t2.z);
 
                 return tNear <= tFar;
             }
@@ -327,8 +325,10 @@ Shader "Raytracing"
             {
                 const Ray ray = GetInitialRay(i.uv);
                 const uint seed = GetSeed(i.uv);
-                
-                return Trace(ray, seed);
+                const fixed4 color = Trace(ray, seed);
+
+                const float weight = 1.0 / (_RenderedFrames + 1);
+                return saturate(tex2D(_PreviousFrame, i.uv) * (1 - weight) + color * weight);
             }
             ENDHLSL
         }

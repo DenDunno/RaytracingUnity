@@ -7,10 +7,11 @@ public class Raytracing : MonoBehaviour
     [SerializeField] private bool _useRaytracing;
     private readonly AccumulateTextures _textures = new();
     private int _renderedFrames;
-
+    
     public void Enable(Room room)
     {
-        _raytracingBridge.BufferData(room);
+        _textures.TryResize();
+        _raytracingBridge.BufferData(room, _textures);
         _renderedFrames = 0;
         _useRaytracing = true;
     }
@@ -24,8 +25,7 @@ public class Raytracing : MonoBehaviour
     {
         if (_useRaytracing)
         {
-            _textures.TryResize();
-            _raytracingBridge.DrawToTexture(_textures, _renderedFrames);
+            _raytracingBridge.Dispatch(_renderedFrames);
             CopyCurrentFrameToPrevious();
             DrawToScreen(destination);
             TryMoveSeed();

@@ -2459,7 +2459,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _raytracingBridge:
     _camera: {fileID: 963194227}
-    _material: {fileID: 2100000, guid: 789c20e4131052143be447bac2f7996e, type: 2}
+    _material: {fileID: 7200000, guid: 3e2185076dfc485a9adc40a6c5761a8e, type: 3}
     _numOfRays: 1
     _numOfReflections: 4
   _useRaytracing: 0
@@ -2477,8 +2477,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _xCount: 100
   _yCount: 100
-  _zOffset: 2
-  _showHitRays: 1
+  _zOffset: 5.54
+  _showHitRays: 0
   _testObject: {fileID: 1667216141}
 --- !u!1 &1126975213
 GameObject:

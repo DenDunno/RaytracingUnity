@@ -12,6 +12,7 @@ public class RayTracingMaterialPropertyIndices
     public readonly int Triangles;
     public readonly int Meshes;
     public readonly int PreviousFrame;
+    public readonly int CurrentFrame;
     
     public RayTracingMaterialPropertyIndices()
     {
@@ -25,5 +26,6 @@ public class RayTracingMaterialPropertyIndices
         Triangles = Shader.PropertyToID("_Triangles");
         Meshes = Shader.PropertyToID("_Meshes");
         PreviousFrame = Shader.PropertyToID("_PreviousFrame");
+        CurrentFrame = Shader.PropertyToID("_CurrentFrame");
     }
 }
